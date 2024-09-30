@@ -4,38 +4,50 @@ import { invoke } from '@tauri-apps/api'
 
 defineProps<{ msg: string }>()
 
-const count = ref(0)
-invoke('greet', { name: 'World' })
+const active_value = ref('')
+const options = ref([])
+
+invoke('get_all_env', {})
   // `invoke` 返回的是一个 Promise
-  .then((response) => console.log(response))
+  .then((values) => {
+    let options_arr = []
+    for (const val of values) {
+      options_arr.push({
+        value: val[1],
+        label: val[0]
+      })
+    }
+    options.value = options_arr
+  })
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
-  <el-button type="primary">Primary Button</el-button>
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
-  </div>
-
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Learn more about IDE Support for Vue in the
-    <a
-      href="https://vuejs.org/guide/scaling-up/tooling.html#ide-support"
-      target="_blank"
-      >Vue Docs Scaling up Guide</a
-    >.
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+  <el-row :gutter="12">
+    <el-col :span="24">
+      <el-select 
+      v-model="active_value" 
+      class="m-2" 
+      filterable 
+      placeholder="Select" 
+      size="large"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-col>
+    <el-col :span="24">
+      <el-input
+        v-model="active_value"
+        :rows="2"
+        type="textarea"
+        placeholder="Please input"
+      />
+    </el-col>
+  </el-row>
 </template>
 
 <style scoped>

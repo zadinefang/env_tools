@@ -55,10 +55,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 230,
         "resizable": true,
         "title": "环境管理器(方)",
-        "width": 800
+        "width": 430
       }
     ]
   }
