@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { invoke } from '@tauri-apps/api'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 defineProps<{ msg: string }>()
 
@@ -19,16 +20,32 @@ invoke('get_all_env', {})
     }
     options.value = options_arr
   })
+
+const addNewEnv = ()=>{
+  ElMessageBox.prompt('请输入名称(key):', '新建环境变量', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+  })
+    .then(({ value }) => {
+      ElMessage({
+        type: 'success',
+        message: `您输入的是: ${value}`,
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消输入',
+      })
+    })
+}
 </script>
 
 <template>
-  2
-  
   <el-row :gutter="12">
     <el-col :span="24">
       <el-select 
       v-model="active_value" 
-      class="m-2" 
       filterable 
       placeholder="Select" 
       size="large"
@@ -41,13 +58,18 @@ invoke('get_all_env', {})
         />
       </el-select>
     </el-col>
-    <el-col :span="24">
+    <el-col :span="24" class="mt-2">
       <el-input
         v-model="active_value"
-        :rows="2"
+        :rows="6"
         type="textarea"
         placeholder="Please input"
       />
+    </el-col>
+    <el-col :span="24" class="mt-2">
+      <el-button type="primary" @click="addNewEnv" text bg>新增</el-button>
+      <el-button type="danger" text bg>删除</el-button>
+      <el-button type="success" text bg>保存</el-button>
     </el-col>
   </el-row>
 </template>
