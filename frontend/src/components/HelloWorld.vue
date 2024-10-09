@@ -82,7 +82,7 @@ const delEnv = ()=>{
         if(flag === 0){
           ElMessage({
             type: 'success',
-            message: `成功删除环境变量: ${value}`,
+            message: `成功删除环境变量: ${active_value.value}`,
           })
           getAllEnv()
         }else if(flag === 1) {
@@ -94,30 +94,6 @@ const delEnv = ()=>{
       })
 }
 
-const updateEnv ()=>{
-  if(active_value.value === ''){
-    ElMessage({
-      type: 'error',
-      message: '未选择任何环境变量!',
-    })
-    return false
-  }
-  invoke('update_env', {key: active_value.value, new_value})
-      .then((flag) => {
-        if(flag === 0){
-          ElMessage({
-            type: 'success',
-            message: `成功删除环境变量: ${value}`,
-          })
-          getAllEnv()
-        }else if(flag === 1) {
-          ElMessage({
-            type: 'error',
-            message: '内部错误,请联系管理员',
-          })
-        }
-      })
-}
 </script>
 
 <template>
