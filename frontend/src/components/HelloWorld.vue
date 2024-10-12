@@ -11,7 +11,6 @@ interface Option {
 }
 
 const active_value = ref('')
-const input_value = ref('')
 const options= ref<Option[]>([])
 
 onMounted(()=>{
@@ -33,32 +32,38 @@ const getAllEnv = () => {
   })
 }
 
+const decrypt = () => {
+  if(active_value.value === ''){
+    ElMessage({
+      type: 'error',
+      message: '未选择任何环境变量!',
+    })
+    return false
+  }
 
-const addNewEnv = ()=>{
-  ElMessageBox.prompt('请输入名称(key):', '新建环境变量', {
+  invoke('decrypt', {input: active_value.value, salt: 'itsp'})
+      .then((resText) => {
+        const result = resText as string
+        ElMessageBox.confirm(result, '结果', {
+          confirmButtonText: '复制',
+          cancelButtonText: '关闭',
+        }).then(async () => {
+          await navigator.clipboard.writeText(result)
+        })
+      })
+}
+
+
+const cryption = ()=>{
+  ElMessageBox.prompt('请输入加密密钥:', '加密', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
   })
     .then(({ value }) => {
-      invoke('add_new_env', {key: value})
-      .then((flag) => {
-        if(flag === 0){
-          ElMessage({
-            type: 'success',
-            message: `成功添加环境变量: ${value}`,
-          })
-          getAllEnv()
-        }else if(flag === 1) {
-          ElMessage({
-            type: 'error',
-            message: '内部错误,请联系管理员',
-          })
-        }else if(flag === 2){
-          ElMessage({
-            type: 'warning',
-            message: `环境变量已存在!: ${value}`,
-          })
-        }
+      invoke('encrypt', {input: value, salt: "itsp"})
+      .then((resText) => {
+        const result = resText as string
+        console.log(result)
       })
     })
     .catch(() => {
@@ -67,31 +72,6 @@ const addNewEnv = ()=>{
         message: '取消输入',
       })
     })
-}
-
-const delEnv = ()=>{
-  if(active_value.value === ''){
-    ElMessage({
-      type: 'error',
-      message: '未选择任何环境变量!',
-    })
-    return false
-  }
-  invoke('del_env', {key: active_value.value})
-      .then((flag) => {
-        if(flag === 0){
-          ElMessage({
-            type: 'success',
-            message: `成功删除环境变量: ${active_value.value}`,
-          })
-          getAllEnv()
-        }else if(flag === 1) {
-          ElMessage({
-            type: 'error',
-            message: '内部错误,请联系管理员',
-          })
-        }
-      })
 }
 
 </script>
@@ -122,9 +102,8 @@ const delEnv = ()=>{
       />
     </el-col>
     <el-col :span="24" class="mt-2">
-      <el-button type="primary" @click="addNewEnv" text bg>新增</el-button>
-      <el-button type="danger" @click="delEnv" text bg>删除</el-button>
-      <el-button type="success" @click="updateEnv" text bg>保存</el-button>
+      <el-button type="primary" @click="cryption" text bg>加密</el-button>
+      <el-button type="primary" @click="decrypt" text bg>解密</el-button>
     </el-col>
   </el-row>
 </template>

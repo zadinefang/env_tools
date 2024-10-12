@@ -3,10 +3,28 @@
 
 use std::env;
 use std::process::Command;
+mod cryption;
 
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}!", name)
+fn encrypt(input: &str, salt: &str) -> String {
+    let key = cryption::convert_to_aes_key(salt);
+    let encrypted = cryption::encrypt_string(input, &key);
+    hex::encode(&encrypted)
+}
+
+#[tauri::command]
+fn decrypt(input: &str, salt: &str) -> String {
+    let key = cryption::convert_to_aes_key(salt);
+
+    let input_hex = match hex::decode(input) {
+        Ok(decoded) => decoded,
+        Err(_) => return String::from("解密失败：无效的十六进制字符串"),
+    };
+
+    match cryption::decrypt_string(&input_hex, &key) {
+        Ok(decrypted) => decrypted,
+        Err(err_msg) => err_msg.to_string(),
+    }
 }
 
 #[tauri::command]
@@ -67,8 +85,12 @@ fn get_all_env() -> Vec<(String, String)> {
 }
 
 fn main() {
+    // 启用完整回溯信息
+    unsafe { env::set_var("RUST_BACKTRACE", "full"); }
+
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_all_env, add_new_env, del_env, update_env])
+        .invoke_handler(tauri::generate_handler![encrypt, decrypt, get_all_env, add_new_env, del_env, update_env])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
 }
