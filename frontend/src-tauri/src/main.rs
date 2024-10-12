@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use dotenv::dotenv;
 use std::env;
 use std::process::Command;
 mod cryption;
@@ -85,9 +86,9 @@ fn get_all_env() -> Vec<(String, String)> {
 }
 
 fn main() {
+    dotenv().ok(); // 加载 .env 文件
     // 启用完整回溯信息
     unsafe { env::set_var("RUST_BACKTRACE", "full"); }
-
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![encrypt, decrypt, get_all_env, add_new_env, del_env, update_env])
         .run(tauri::generate_context!())

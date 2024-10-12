@@ -24,7 +24,7 @@
       "icon": [
         "icons/face.png"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.zadine.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

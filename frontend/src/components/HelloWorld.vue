@@ -63,7 +63,12 @@ const cryption = ()=>{
       invoke('encrypt', {input: value, salt: "itsp"})
       .then((resText) => {
         const result = resText as string
-        console.log(result)
+        ElMessageBox.confirm(result, '结果', {
+          confirmButtonText: '复制',
+          cancelButtonText: '关闭',
+        }).then(async () => {
+          await navigator.clipboard.writeText(result)
+        })
       })
     })
     .catch(() => {
